@@ -1,6 +1,6 @@
 name: "Action Read JSON"
 description: "GitHub Action to load properties from a JSON file."
-author: "ActionsTools forked from zoexx"
+author: "Xikaro forked from ActionsTools"
 inputs:
   file_path:
     required: true
