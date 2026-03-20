@@ -17,7 +17,7 @@ inputs:
     description: "if true, arrays are output as YAML-style strings (e.g. \"a\", \"b\")"
     default: "false"
 runs:
-  using: "node16"
+  using: "node20"
   main: "dist/index.js"
 branding:
   color: "yellow"
