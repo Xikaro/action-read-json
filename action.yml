@@ -1,4 +1,4 @@
-name: "read-json-action"
+name: "Action Read JSON"
 description: "GitHub Action to load properties from a JSON file."
 author: "ActionsTools forked from zoexx"
 inputs:
@@ -8,6 +8,14 @@ inputs:
   prop_path:
     required: false
     description: "e.g.: key1.key2"
+  flat_arrays:
+    required: false
+    description: "if true, arrays are output as space-separated strings instead of JSON"
+    default: "false"
+  yaml_arrays:
+    required: false
+    description: "if true, arrays are output as YAML-style strings (e.g. \"a\", \"b\")"
+    default: "false"
 runs:
   using: "node16"
   main: "dist/index.js"

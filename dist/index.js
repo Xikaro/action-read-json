@@ -2178,9 +2178,44 @@ var core = __toModule(require_core());
 var import_fs = __toModule(require("fs"));
 var import_util = __toModule(require("util"));
 var readFileAsync = import_util.default.promisify(import_fs.default.readFile);
+function setOutputs(obj, prefix = "", flatArrays = false, yamlArrays = false) {
+  if (obj === null || obj === void 0 || typeof obj !== "object") {
+    return;
+  }
+  for (const key in obj) {
+    const value = obj[key];
+    const outputKey = prefix ? `${prefix}_${key}` : key;
+    if (Array.isArray(value)) {
+      if (flatArrays) {
+        const flatString = value.map((item) => `"${item}"`).join(" ");
+        core.setOutput(outputKey, flatString);
+      } else if (yamlArrays) {
+        const yamlString = value.map((item) => `"${item}"`).join(", ");
+        core.setOutput(outputKey, yamlString);
+      } else {
+        core.setOutput(outputKey, JSON.stringify(value));
+      }
+      value.forEach((item, idx) => {
+        core.setOutput(`${outputKey}_${idx}`, item);
+        if (item !== null && typeof item === "object") {
+          setOutputs(item, `${outputKey}_${idx}`, flatArrays, yamlArrays);
+        }
+      });
+      if (value.length > 0) {
+        core.setOutput(`${outputKey}_first`, value[0]);
+      }
+    } else if (value !== null && typeof value === "object") {
+      setOutputs(value, outputKey, flatArrays, yamlArrays);
+    } else {
+      core.setOutput(outputKey, value);
+    }
+  }
+}
 async function run() {
   const file_path = core.getInput("file_path");
   const prop_path = core.getInput("prop_path");
+  const flat_arrays = core.getInput("flat_arrays");
+  const yaml_arrays = core.getInput("yaml_arrays");
   let pathArr = [];
   if (prop_path) {
     pathArr = prop_path.split(".");
@@ -2203,9 +2238,7 @@ async function run() {
       }, json);
     }
     if (json && typeof json === "object") {
-      for (const key in json) {
-        core.setOutput(key, json[key]);
-      }
+      setOutputs(json, "", flat_arrays.toLowerCase() === "true", yaml_arrays.toLowerCase() === "true");
     } else if (json) {
       core.setOutput("value", json);
     } else {
